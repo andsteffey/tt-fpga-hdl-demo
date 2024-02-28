@@ -416,13 +416,13 @@ logic FpgaPins_Fpga_CALC_valid_or_reset_a1;
                         FpgaPins_Fpga_CALC_op_a2[2:0] == 3'b000
                            ? FpgaPins_Fpga_CALC_sum_a2[7:0]:
                            //default
-                           FpgaPins_Fpga_CALC_out_a2[7:0];
+                           FpgaPins_Fpga_CALC_out_a3[7:0];
                      //mem MUX
                      assign FpgaPins_Fpga_CALC_mem_a2[7:0] =
                         FpgaPins_Fpga_CALC_reset_a2
                            ? 8'b0 :
                         !FpgaPins_Fpga_CALC_valid_a2
-                           ? FpgaPins_Fpga_CALC_mem_a2 :
+                           ? FpgaPins_Fpga_CALC_mem_a3 :
                         FpgaPins_Fpga_CALC_op_a2[2:0] == 3'b101
                            ? FpgaPins_Fpga_CALC_out_a4 :
                            //default
