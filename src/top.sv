@@ -134,8 +134,8 @@ logic [7:0] FpgaPins_Fpga_CALC_sum_a1,
 logic [7:0] FpgaPins_Fpga_CALC_val1_a1;
 
 // For /fpga_pins/fpga|calc$val2.
-logic [7:0] FpgaPins_Fpga_CALC_val2_a0,
-            FpgaPins_Fpga_CALC_val2_a1;
+logic FpgaPins_Fpga_CALC_val2_a0,
+      FpgaPins_Fpga_CALC_val2_a1;
 
 // For /fpga_pins/fpga|calc$valid.
 logic FpgaPins_Fpga_CALC_valid_a1,
@@ -194,7 +194,7 @@ logic FpgaPins_Fpga_CALC_valid_or_reset_a1;
             always_ff @(posedge clk) FpgaPins_Fpga_CALC_sum_a2[7:0] <= FpgaPins_Fpga_CALC_sum_a1[7:0];
 
             // Staging of $val2.
-            always_ff @(posedge clk) FpgaPins_Fpga_CALC_val2_a1[7:0] <= FpgaPins_Fpga_CALC_val2_a0[7:0];
+            always_ff @(posedge clk) FpgaPins_Fpga_CALC_val2_a1 <= FpgaPins_Fpga_CALC_val2_a0;
 
             // Staging of $valid.
             always_ff @(posedge clk) FpgaPins_Fpga_CALC_valid_a2 <= FpgaPins_Fpga_CALC_valid_a1;
@@ -271,7 +271,7 @@ logic FpgaPins_Fpga_CALC_valid_or_reset_a1;
                assign \///?$valid_or_reset@1$sum = FpgaPins_Fpga_CALC_sum_a1;
                (* keep *) logic [7:0] \///@1$val1 ;
                assign \///@1$val1 = FpgaPins_Fpga_CALC_val1_a1;
-               (* keep *) logic [7:0] \///@0$val2 ;
+               (* keep *) logic  \///@0$val2 ;
                assign \///@0$val2 = FpgaPins_Fpga_CALC_val2_a0;
                (* keep *) logic  \///@1$valid ;
                assign \///@1$valid = FpgaPins_Fpga_CALC_valid_a1;
@@ -324,7 +324,7 @@ logic FpgaPins_Fpga_CALC_valid_or_reset_a1;
                //_|calc
                   //_@0
                      assign FpgaPins_Fpga_CALC_reset_a0 = reset;
-                     assign FpgaPins_Fpga_CALC_val2_a0[7:0] = ui_in[3:0];
+                     assign FpgaPins_Fpga_CALC_val2_a0 = ui_in[3:0];
                      assign FpgaPins_Fpga_CALC_op_a0[2:0] = ui_in[6:4];
                      assign FpgaPins_Fpga_CALC_equals_in_a0 = ui_in[7];
                   //_@1
@@ -337,10 +337,10 @@ logic FpgaPins_Fpga_CALC_valid_or_reset_a1;
                      assign FpgaPins_Fpga_CALC_valid_or_reset_a1 = FpgaPins_Fpga_CALC_valid_a1 || FpgaPins_Fpga_CALC_reset_a1;
                      //_?$valid_or_reset
                         //MUX input computations
-                        assign FpgaPins_Fpga_CALC_sum_a1[7:0] = FpgaPins_Fpga_CALC_val1_a1[7:0] + FpgaPins_Fpga_CALC_val2_a1[7:0]; // $val1[7:0] could be expressed as $val1
-                        assign FpgaPins_Fpga_CALC_diff_a1[7:0] = FpgaPins_Fpga_CALC_val1_a1[7:0] - FpgaPins_Fpga_CALC_val2_a1[7:0];
-                        assign FpgaPins_Fpga_CALC_prod_a1[7:0] = FpgaPins_Fpga_CALC_val1_a1[7:0] * FpgaPins_Fpga_CALC_val2_a1[7:0];
-                        assign FpgaPins_Fpga_CALC_quot_a1[7:0] = FpgaPins_Fpga_CALC_val1_a1[7:0] / FpgaPins_Fpga_CALC_val2_a1[7:0];
+                        assign FpgaPins_Fpga_CALC_sum_a1[7:0] = FpgaPins_Fpga_CALC_val1_a1[7:0] + FpgaPins_Fpga_CALC_val2_a1; // $val1[7:0] could be expressed as $val1
+                        assign FpgaPins_Fpga_CALC_diff_a1[7:0] = FpgaPins_Fpga_CALC_val1_a1[7:0] - FpgaPins_Fpga_CALC_val2_a1;
+                        assign FpgaPins_Fpga_CALC_prod_a1[7:0] = FpgaPins_Fpga_CALC_val1_a1[7:0] * FpgaPins_Fpga_CALC_val2_a1;
+                        assign FpgaPins_Fpga_CALC_quot_a1[7:0] = FpgaPins_Fpga_CALC_val1_a1[7:0] / FpgaPins_Fpga_CALC_val2_a1;
             
             
                   //_@2
