@@ -26,7 +26,7 @@ module top(input logic clk, input logic reset, input logic [31:0] cyc_cnt, outpu
    logic rst_n = ! reset;
 
    // Instantiate the Tiny Tapeout module.
-   tt_um_template tt(.*);
+   my_design tt(.*);
 
    assign passed = top.cyc_cnt > 60;
    assign failed = 1'b0;
@@ -34,7 +34,62 @@ endmodule
 
 
 // Provide a wrapper module to debounce input signals if requested.
+// The Tiny Tapeout top-level module.
+// This simply debounces and synchronizes inputs.
+// Debouncing is based on a counter. A change to any input will only be recognized once ALL inputs
+// are stable for a certain duration. This approach uses a single counter vs. a counter for each
+// bit.
+module tt_um_template (
+    input  wire [7:0] ui_in,    // Dedicated inputs - connected to the input switches
+    output wire [7:0] uo_out,   // Dedicated outputs - connected to the 7 segment display
+    /*   // The FPGA is based on TinyTapeout 3 which has no bidirectional I/Os (vs. TT6 for the ASIC).
+    input  wire [7:0] uio_in,   // IOs: Bidirectional Input path
+    output wire [7:0] uio_out,  // IOs: Bidirectional Output path
+    output wire [7:0] uio_oe,   // IOs: Bidirectional Enable path (active high: 0=input, 1=output)
+    */
+    input  wire       ena,      // will go high when the design is enabled
+    input  wire       clk,      // clock
+    input  wire       rst_n     // reset_n - low to reset
+);
+    
+    // Synchronize.
+    logic [9:0] inputs_ff, inputs_sync;
+    always @(posedge clk) begin
+        inputs_ff <= {ui_in, ena, rst_n};
+        inputs_sync <= inputs_ff;
+    end
 
+    // Debounce.
+    `define DEBOUNCE_MAX_CNT 14'h3fff
+    logic [9:0] inputs_candidate, inputs_captured;
+    logic sync_rst_n = inputs_sync[0];
+    logic [13:0] cnt;
+    always @(posedge clk) begin
+        if (!sync_rst_n)
+           cnt <= `DEBOUNCE_MAX_CNT;
+        else if (inputs_sync != inputs_candidate) begin
+           // Inputs changed before stablizing.
+           cnt <= `DEBOUNCE_MAX_CNT;
+           inputs_candidate <= inputs_sync;
+        end
+        else if (cnt > 0)
+           cnt <= cnt - 14'b1;
+        else begin
+           // Cnt == 0. Capture candidate inputs.
+           inputs_captured <= inputs_candidate;
+        end
+    end
+    logic [7:0] clean_ui_in;
+    logic clean_ena, clean_rst_n;
+    assign {clean_ui_in, clean_ena, clean_rst_n} = inputs_captured;
+
+    my_design my_design (
+        .ui_in(clean_ui_in),
+        
+        .ena(clean_ena),
+        .rst_n(clean_rst_n),
+        .*);
+endmodule
 //_\SV
 
 
@@ -43,7 +98,7 @@ endmodule
 // The Tiny Tapeout module
 // =======================
 
-module tt_um_template (
+module my_design (
     input  wire [7:0] ui_in,    // Dedicated inputs - connected to the input switches
     output wire [7:0] uo_out,   // Dedicated outputs - connected to the 7 segment display
     /*   // The FPGA is based on TinyTapeout 3 which has no bidirectional I/Os (vs. TT6 for the ASIC).
@@ -134,8 +189,8 @@ logic [7:0] FpgaPins_Fpga_CALC_sum_a1,
 logic [7:0] FpgaPins_Fpga_CALC_val1_a1;
 
 // For /fpga_pins/fpga|calc$val2.
-logic FpgaPins_Fpga_CALC_val2_a0,
-      FpgaPins_Fpga_CALC_val2_a1;
+logic [7:0] FpgaPins_Fpga_CALC_val2_a0,
+            FpgaPins_Fpga_CALC_val2_a1;
 
 // For /fpga_pins/fpga|calc$valid.
 logic FpgaPins_Fpga_CALC_valid_a1,
@@ -194,7 +249,7 @@ logic FpgaPins_Fpga_CALC_valid_or_reset_a1;
             always_ff @(posedge clk) FpgaPins_Fpga_CALC_sum_a2[7:0] <= FpgaPins_Fpga_CALC_sum_a1[7:0];
 
             // Staging of $val2.
-            always_ff @(posedge clk) FpgaPins_Fpga_CALC_val2_a1 <= FpgaPins_Fpga_CALC_val2_a0;
+            always_ff @(posedge clk) FpgaPins_Fpga_CALC_val2_a1[7:0] <= FpgaPins_Fpga_CALC_val2_a0[7:0];
 
             // Staging of $valid.
             always_ff @(posedge clk) FpgaPins_Fpga_CALC_valid_a2 <= FpgaPins_Fpga_CALC_valid_a1;
@@ -271,7 +326,7 @@ logic FpgaPins_Fpga_CALC_valid_or_reset_a1;
                assign \///?$valid_or_reset@1$sum = FpgaPins_Fpga_CALC_sum_a1;
                (* keep *) logic [7:0] \///@1$val1 ;
                assign \///@1$val1 = FpgaPins_Fpga_CALC_val1_a1;
-               (* keep *) logic  \///@0$val2 ;
+               (* keep *) logic [7:0] \///@0$val2 ;
                assign \///@0$val2 = FpgaPins_Fpga_CALC_val2_a0;
                (* keep *) logic  \///@1$valid ;
                assign \///@1$valid = FpgaPins_Fpga_CALC_valid_a1;
@@ -324,7 +379,7 @@ logic FpgaPins_Fpga_CALC_valid_or_reset_a1;
                //_|calc
                   //_@0
                      assign FpgaPins_Fpga_CALC_reset_a0 = reset;
-                     assign FpgaPins_Fpga_CALC_val2_a0 = ui_in[3:0];
+                     assign FpgaPins_Fpga_CALC_val2_a0[7:0] = {4'b0000, ui_in[3:0]};
                      assign FpgaPins_Fpga_CALC_op_a0[2:0] = ui_in[6:4];
                      assign FpgaPins_Fpga_CALC_equals_in_a0 = ui_in[7];
                   //_@1
