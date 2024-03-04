@@ -493,7 +493,7 @@ logic FpgaPins_Fpga_CALC_Keypad_sampling_a0,
                //_|calc
             
                   //_@-1
-                     assign FpgaPins_Fpga_CALC_reset_n1 = reset || ui_in[7];
+                     assign FpgaPins_Fpga_CALC_reset_n1 = reset;
             
                   //_\source /raw.githubusercontent.com/efabless/chipcraftmestcourse/main/referencedesigns/PmodKYPD.tlv 70   // Instantiated from top.tlv, 56 as: m5+PmodKYPD(|calc, /keypad, @0, $ui_in[3:0], 1'b1, ⌈left: 40, top: 80, width: 20, height: 20⌉)
                      //_/keypad
