@@ -44,35 +44,30 @@
    m4_include_lib(https:/['']/raw.githubusercontent.com/efabless/chipcraft---mest-course/main/tlv_lib/calculator_shell_lib.tlv)
    // Include Tiny Tapeout Lab.
    m4_include_lib(https:/['']/raw.githubusercontent.com/os-fpga/Virtual-FPGA-Lab/35e36bd144fddd75495d4cbc01c4fc50ac5bde6f/tlv_lib/tiny_tapeout_lib.tlv)
-   m4_include_lib(https:/['']/raw.githubusercontent.com/efabless/chipcraft---mest-course/main/reference_designs/PmodKYPD.tlv)
+   m4_include_lib(https:/['']/github.com/efabless/chipcraft---mest-course/blob/main/reference_designs/PmodKYPD.tlv)
+
 
 \TLV calc()
    
    |calc
       
-      @-1
-         $reset = *reset || *ui_in[7];
-      
-      m5+PmodKYPD(|calc, /keypad, @0, $ui_in[3:0], 1'b1, ['left: 40, top: 80, width: 20, height: 20'])
+      //@-1
+      //   $reset = *reset || *ui_in[7];
+      //m5+PmodKYPD(|calc, /keypad, @0, $ui_in[3:0], 1'b1, ['left: 40, top: 80, width: 20, height: 20'])
       @0
-         
+         $reset = *reset;
          // using switches
-         $ui_in[3:0] = *ui_in[3:0];
-         
+         $val2[7:0] = {4'b0000, *ui_in[3:0]};
          $op[2:0] = *ui_in[6:4];
-         //$op[2:0] = $rand;
-         
          $equals_in = *ui_in[7];
          
       @1   
          $val1[7:0] = >>2$out[7:0];
-         $val2[7:0] = {4'b0000, /keypad$digit_pressed};
-      @2   
+         
          //Counter 
          $valid = (($equals_in == 1) && (>>1$equals_in == 0)); //? 1 : 0;
-         //$valid = $reset ? 0 : >>1$valid + 1; 
-         //$cnt = $reset ? 0 : >>1$cnt + 1;
-         //$valid = $cnt;
+         //$valid = $reset ? 0 : >>1$valid + 1; $cnt[0] = $reset ? 0 : >>1$cnt[0] + 1;
+                                                //$valid[0] = $cnt[0];
          $valid_or_reset = $valid || $reset;
          ?$valid_or_reset
             //MUX input computations
@@ -82,7 +77,7 @@
             $quot[7:0] = $val1[7:0] / $val2;
          
          
-      @3
+      @2
          //Encoded MUX
          $out[7:0] =
             $reset
@@ -113,16 +108,9 @@
                >>1$mem;
          
          
-      @4
-         //m5+sseg_decoder($segments_n, /keypad$digit_pressed)
-         
-         
-         
-         
-         
-         
+      @3
          $digit[3:0] = $out[3:0];
-         $out_digit[7:0] = 
+         *uo_out =
             $digit == 4'h0 //2'b0000 
                ? 8'b00111111 ://0
             $digit == 4'h1 //2'b0001
@@ -157,15 +145,12 @@
                ? 8'b01110001 ://f
             //default
                8'b10000000;  //.
-         *uo_out = /keypad$sampling ? {2{/keypad$sample_row_mask[3:0]}} :
-                   $out_digit;
-         
-   
+      
    // Note that pipesignals assigned here can be found under /fpga_pins/fpga.
    
    
 
-   //m5+cal_viz(@2, /fpga) // un-comment for markerchip comment out for FPGA programming 
+   m5+cal_viz(@2, /fpga) // un-comment for markerchip comment out for FPGA programming 
    
    // Connect Tiny Tapeout outputs. Note that uio_ outputs are not available in the Tiny-Tapeout-3-based FPGA boards.
    m5_if_neq(m5_target, FPGA, ['*uio_out = 8'b0;'])
@@ -192,7 +177,7 @@ module top(input logic clk, input logic reset, input logic [31:0] cyc_cnt, outpu
    // Instantiate the Tiny Tapeout module.
    m5_user_module_name tt(.*);
    
-   assign passed = top.cyc_cnt > 400;
+   assign passed = top.cyc_cnt > 60;
    assign failed = 1'b0;
 endmodule
 
@@ -229,8 +214,8 @@ module m5_user_module_name (
    // Instantiate the Virtual FPGA Lab.
    m5+board(/top, /fpga, 7, $, , calc)
    // Label the switch inputs [0..7] (1..8 on the physical switch panel) (top-to-bottom).
-   m5+tt_input_labels_viz(['"Value[0]", "Value[1]", "Value[2]", "Value[3]", "Op[0]", "Op[1]", "Op[2]", "="'])//switches
-   //m5+tt_input_labels_viz(['"KYPD row0", "KYPD row1", "KYPD row2", "KYPD row3", "D:Mask", "D:High/Dbg", "D:Reported", "Reset"'])
+   //m5+tt_input_labels_viz(['"Value[0]", "Value[1]", "Value[2]", "Value[3]", "Op[0]", "Op[1]", "Op[2]", "="'])//switches
+   m5+tt_input_labels_viz(['"KYPD row0", "KYPD row1", "KYPD row2", "KYPD row3", "D:Mask", "D:High/Dbg", "D:Reported", "Reset"'])
 
 \SV
 endmodule
