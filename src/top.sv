@@ -92,13 +92,8 @@ logic [7:0] FpgaPins_Fpga_CALC_diff_a2,
             FpgaPins_Fpga_CALC_diff_a3;
 
 // For /fpga_pins/fpga|calc$digit_flash.
-logic FpgaPins_Fpga_CALC_digit_flash_a4,
-      FpgaPins_Fpga_CALC_digit_flash_a5,
-      FpgaPins_Fpga_CALC_digit_flash_a6,
-      FpgaPins_Fpga_CALC_digit_flash_a7,
-      FpgaPins_Fpga_CALC_digit_flash_a8,
-      FpgaPins_Fpga_CALC_digit_flash_a9,
-      FpgaPins_Fpga_CALC_digit_flash_a10;
+logic [31:0] FpgaPins_Fpga_CALC_digit_flash_a4,
+             FpgaPins_Fpga_CALC_digit_flash_a5;
 
 // For /fpga_pins/fpga|calc$digit_one.
 logic [3:0] FpgaPins_Fpga_CALC_digit_one_a4;
@@ -255,12 +250,7 @@ logic FpgaPins_Fpga_CALC_Keypad_sampling_a0,
             always_ff @(posedge clk) FpgaPins_Fpga_CALC_diff_a3[7:0] <= FpgaPins_Fpga_CALC_diff_a2[7:0];
 
             // Staging of $digit_flash.
-            always_ff @(posedge clk) FpgaPins_Fpga_CALC_digit_flash_a5 <= FpgaPins_Fpga_CALC_digit_flash_a4;
-            always_ff @(posedge clk) FpgaPins_Fpga_CALC_digit_flash_a6 <= FpgaPins_Fpga_CALC_digit_flash_a5;
-            always_ff @(posedge clk) FpgaPins_Fpga_CALC_digit_flash_a7 <= FpgaPins_Fpga_CALC_digit_flash_a6;
-            always_ff @(posedge clk) FpgaPins_Fpga_CALC_digit_flash_a8 <= FpgaPins_Fpga_CALC_digit_flash_a7;
-            always_ff @(posedge clk) FpgaPins_Fpga_CALC_digit_flash_a9 <= FpgaPins_Fpga_CALC_digit_flash_a8;
-            always_ff @(posedge clk) FpgaPins_Fpga_CALC_digit_flash_a10 <= FpgaPins_Fpga_CALC_digit_flash_a9;
+            always_ff @(posedge clk) FpgaPins_Fpga_CALC_digit_flash_a5[31:0] <= FpgaPins_Fpga_CALC_digit_flash_a4[31:0];
 
             // Staging of $equals_in.
             always_ff @(posedge clk) FpgaPins_Fpga_CALC_equals_in_a1 <= FpgaPins_Fpga_CALC_equals_in_a0;
@@ -403,7 +393,7 @@ logic FpgaPins_Fpga_CALC_Keypad_sampling_a0,
             if (1) begin : P_calc
                (* keep *) logic [7:0] \///?$valid_or_reset@2$diff ;
                assign \///?$valid_or_reset@2$diff = FpgaPins_Fpga_CALC_diff_a2;
-               (* keep *) logic  \///@4$digit_flash ;
+               (* keep *) logic [31:0] \///@4$digit_flash ;
                assign \///@4$digit_flash = FpgaPins_Fpga_CALC_digit_flash_a4;
                (* keep *) logic [3:0] \///@4$digit_one ;
                assign \///@4$digit_one = FpgaPins_Fpga_CALC_digit_one_a4;
@@ -750,12 +740,12 @@ logic FpgaPins_Fpga_CALC_Keypad_sampling_a0,
                         //default
                            8'b00000000;  //nothing
             
-                     assign FpgaPins_Fpga_CALC_digit_flash_a4 = FpgaPins_Fpga_CALC_valid_a4 ? 0 : FpgaPins_Fpga_CALC_digit_flash_a10 + 1;
+                     assign FpgaPins_Fpga_CALC_digit_flash_a4[31:0] = FpgaPins_Fpga_CALC_valid_a4 ? 0 : FpgaPins_Fpga_CALC_digit_flash_a5 + 1;
             
             
             
                      assign uo_out = FpgaPins_Fpga_CALC_Keypad_sampling_a4 ? {2{FpgaPins_Fpga_CALC_Keypad_sample_row_mask_a4[3:0]}} :
-                               FpgaPins_Fpga_CALC_digit_flash_a4 == 1
+                               FpgaPins_Fpga_CALC_digit_flash_a4[31]
                                   ? FpgaPins_Fpga_CALC_out_digitten_a4 :
             
                                     FpgaPins_Fpga_CALC_out_digitone_a4;
