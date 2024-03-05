@@ -109,7 +109,8 @@ logic [7:0] FpgaPins_Fpga_CALC_mem_a3,
 logic [2:0] FpgaPins_Fpga_CALC_op_a0,
             FpgaPins_Fpga_CALC_op_a1,
             FpgaPins_Fpga_CALC_op_a2,
-            FpgaPins_Fpga_CALC_op_a3;
+            FpgaPins_Fpga_CALC_op_a3,
+            FpgaPins_Fpga_CALC_op_a4;
 
 // For /fpga_pins/fpga|calc$out.
 logic [7:0] FpgaPins_Fpga_CALC_out_a3,
@@ -251,6 +252,7 @@ logic FpgaPins_Fpga_CALC_Keypad_sampling_a0,
             always_ff @(posedge clk) FpgaPins_Fpga_CALC_op_a1[2:0] <= FpgaPins_Fpga_CALC_op_a0[2:0];
             always_ff @(posedge clk) FpgaPins_Fpga_CALC_op_a2[2:0] <= FpgaPins_Fpga_CALC_op_a1[2:0];
             always_ff @(posedge clk) FpgaPins_Fpga_CALC_op_a3[2:0] <= FpgaPins_Fpga_CALC_op_a2[2:0];
+            always_ff @(posedge clk) FpgaPins_Fpga_CALC_op_a4[2:0] <= FpgaPins_Fpga_CALC_op_a3[2:0];
 
             // Staging of $out.
             always_ff @(posedge clk) FpgaPins_Fpga_CALC_out_a4[7:0] <= FpgaPins_Fpga_CALC_out_a3[7:0];
@@ -612,15 +614,15 @@ logic FpgaPins_Fpga_CALC_Keypad_sampling_a0,
                            ? 8'b0 :
                         !FpgaPins_Fpga_CALC_valid_a3
                            ? FpgaPins_Fpga_CALC_out_a4 :
-                        FpgaPins_Fpga_CALC_op_a3[2:0] == 3'b100
+                        FpgaPins_Fpga_CALC_op_a4[2:0] == 3'b100
                            ? FpgaPins_Fpga_CALC_mem_a5[7:0] :
-                        FpgaPins_Fpga_CALC_op_a3[2:0] == 3'b011
+                        FpgaPins_Fpga_CALC_op_a4[2:0] == 3'b011
                            ? FpgaPins_Fpga_CALC_quot_a3[7:0] :
-                        FpgaPins_Fpga_CALC_op_a3[2:0] == 3'b010
+                        FpgaPins_Fpga_CALC_op_a4[2:0] == 3'b010
                            ? FpgaPins_Fpga_CALC_prod_a3[7:0] :
-                        FpgaPins_Fpga_CALC_op_a3[2:0] == 3'b001
+                        FpgaPins_Fpga_CALC_op_a4[2:0] == 3'b001
                            ? FpgaPins_Fpga_CALC_diff_a3[7:0] :
-                        FpgaPins_Fpga_CALC_op_a3[2:0] == 3'b000
+                        FpgaPins_Fpga_CALC_op_a4[2:0] == 3'b000
                            ? FpgaPins_Fpga_CALC_sum_a3[7:0]:
                            //default
                            FpgaPins_Fpga_CALC_out_a4[7:0];
@@ -669,7 +671,7 @@ logic FpgaPins_Fpga_CALC_Keypad_sampling_a0,
                         FpgaPins_Fpga_CALC_digit_a4 == 4'ha
                            ? 8'b01110111 ://a
                         FpgaPins_Fpga_CALC_digit_a4 == 4'hb
-                           ? 8'b01110111 ://b
+                           ? 8'b01111100 ://b
                         FpgaPins_Fpga_CALC_digit_a4 == 4'hc
                            ? 8'b00111001 ://c
                         FpgaPins_Fpga_CALC_digit_a4 == 4'hd
