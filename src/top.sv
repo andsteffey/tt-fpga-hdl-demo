@@ -92,7 +92,7 @@ logic [7:0] FpgaPins_Fpga_CALC_diff_a2,
             FpgaPins_Fpga_CALC_diff_a3;
 
 // For /fpga_pins/fpga|calc$digit_flash.
-logic [28:0] FpgaPins_Fpga_CALC_digit_flash_a4,
+logic [26:0] FpgaPins_Fpga_CALC_digit_flash_a4,
              FpgaPins_Fpga_CALC_digit_flash_a5;
 
 // For /fpga_pins/fpga|calc$digit_one.
@@ -250,7 +250,7 @@ logic FpgaPins_Fpga_CALC_Keypad_sampling_a0,
             always_ff @(posedge clk) FpgaPins_Fpga_CALC_diff_a3[7:0] <= FpgaPins_Fpga_CALC_diff_a2[7:0];
 
             // Staging of $digit_flash.
-            always_ff @(posedge clk) FpgaPins_Fpga_CALC_digit_flash_a5[28:0] <= FpgaPins_Fpga_CALC_digit_flash_a4[28:0];
+            always_ff @(posedge clk) FpgaPins_Fpga_CALC_digit_flash_a5[26:0] <= FpgaPins_Fpga_CALC_digit_flash_a4[26:0];
 
             // Staging of $equals_in.
             always_ff @(posedge clk) FpgaPins_Fpga_CALC_equals_in_a1 <= FpgaPins_Fpga_CALC_equals_in_a0;
@@ -393,7 +393,7 @@ logic FpgaPins_Fpga_CALC_Keypad_sampling_a0,
             if (1) begin : P_calc
                (* keep *) logic [7:0] \///?$valid_or_reset@2$diff ;
                assign \///?$valid_or_reset@2$diff = FpgaPins_Fpga_CALC_diff_a2;
-               (* keep *) logic [28:0] \///@4$digit_flash ;
+               (* keep *) logic [26:0] \///@4$digit_flash ;
                assign \///@4$digit_flash = FpgaPins_Fpga_CALC_digit_flash_a4;
                (* keep *) logic [3:0] \///@4$digit_one ;
                assign \///@4$digit_one = FpgaPins_Fpga_CALC_digit_one_a4;
@@ -740,15 +740,15 @@ logic FpgaPins_Fpga_CALC_Keypad_sampling_a0,
                         //default
                            8'b00000000;  //nothing
             
-                     assign FpgaPins_Fpga_CALC_digit_flash_a4[28:0] = FpgaPins_Fpga_CALC_valid_a4 ? 0 : FpgaPins_Fpga_CALC_digit_flash_a5 + 1;
+                     assign FpgaPins_Fpga_CALC_digit_flash_a4[26:0] = FpgaPins_Fpga_CALC_valid_a4 ? 0 : FpgaPins_Fpga_CALC_digit_flash_a5 + 1;
             
             
             
                      assign uo_out = FpgaPins_Fpga_CALC_Keypad_sampling_a4 ? {2{FpgaPins_Fpga_CALC_Keypad_sample_row_mask_a4[3:0]}} :
-                               FpgaPins_Fpga_CALC_digit_flash_a4[27]
-                                  ? FpgaPins_Fpga_CALC_out_digitten_a4 :
+                               FpgaPins_Fpga_CALC_digit_flash_a4[25]
+                                  ? FpgaPins_Fpga_CALC_out_digitone_a4 :
             
-                                    FpgaPins_Fpga_CALC_out_digitone_a4;
+                                    FpgaPins_Fpga_CALC_out_digitten_a4;
             
             
                // Note that pipesignals assigned here can be found under /fpga_pins/fpga.
